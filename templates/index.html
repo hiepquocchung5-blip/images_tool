@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VectorAI V4 | Perfect Background Removal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col selection:bg-indigo-100">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+        <div class="flex items-center gap-2 text-indigo-600 font-bold text-lg md:text-xl tracking-tight">
+            <i data-lucide="sparkles" class="w-5 h-5 md:w-6 md:h-6"></i>
+            <span>VectorAI <span class="text-xs text-indigo-400 border border-indigo-200 bg-indigo-50 px-2 py-0.5 rounded-full ml-2 align-middle">V4</span></span>
+        </div>
+        <div class="hidden sm:block text-xs font-medium text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full">
+            Flask Engine
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 md:py-8 flex flex-col">
+        
+        <!-- Header Ad Slot -->
+        <div class="w-full flex justify-center my-4 overflow-hidden min-h-[90px]">
+            <script>
+                atOptions = { 'key' : '46a22791c454e27450f03aa3e518df38', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+            </script>
+            <script src="https://www.highperformanceformat.com/46a22791c454e27450f03aa3e518df38/invoke.js"></script>
+        </div>
+
+        <!-- Title -->
+        <div class="text-center mb-6 md:mb-8 mt-2 md:mt-4">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-3 md:mb-4 tracking-tight leading-tight">
+                Perfect Background Removal
+            </h1>
+            <p class="text-base md:text-lg text-slate-600 max-w-2xl mx-auto px-2">
+                Upload a <span class="font-semibold text-slate-800">.png</span>. Our AI executes a flawless edge cut and generates perfectly clean, transparent SVGs instantly.
+            </p>
+        </div>
+
+        <!-- App Container -->
+        <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-6 md:mb-8">
+            
+            <!-- Error Banner -->
+            <div id="error-banner" class="hidden m-4 md:m-6 p-3 md:p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg md:rounded-xl text-sm flex items-start md:items-center gap-2 md:gap-3">
+                <i data-lucide="file-warning" class="w-5 h-5 shrink-0 mt-0.5 md:mt-0"></i>
+                <span><span class="font-semibold">Error:</span> <span id="error-text"></span></span>
+            </div>
+
+            <!-- VIEW 1: Upload Zone -->
+            <div id="upload-view" class="p-8 md:p-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 m-4 md:m-6 rounded-xl md:rounded-2xl transition-all cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 group">
+                <div class="bg-indigo-100 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <i data-lucide="upload-cloud" class="w-8 h-8 md:w-10 md:h-10 text-indigo-600"></i>
+                </div>
+                <h3 class="text-base md:text-lg font-semibold mb-1 text-center">Click or drag your PNG here</h3>
+                <p class="text-slate-500 text-xs md:text-sm mb-4 text-center">Max size: 10MB • Format: PNG only</p>
+                <button class="bg-indigo-600 text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-medium hover:bg-indigo-700 transition-colors mt-2 text-sm md:text-base shadow-sm">
+                    Select Image
+                </button>
+                <input type="file" id="file-input" accept="image/png" class="hidden" />
+            </div>
+
+            <!-- VIEW 2: Preview & Process -->
+            <div id="preview-view" class="hidden p-4 md:p-8 flex-col items-center">
+                <div class="relative w-full max-w-sm aspect-square rounded-xl md:rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 mb-4 shadow-inner">
+                    <img id="image-preview" src="" alt="Preview" class="w-full h-full object-contain" />
+                </div>
+                <div class="text-center mb-8">
+                    <p id="file-name" class="text-slate-700 font-medium truncate max-w-[280px] md:max-w-md"></p>
+                    <p id="file-size" class="text-slate-500 text-sm"></p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full max-w-md">
+                    <button id="btn-cancel" class="flex-1 px-6 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all text-sm md:text-base">
+                        Cancel
+                    </button>
+                    <button id="btn-process" class="flex-[2] px-6 md:px-8 py-3 rounded-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+                        <i data-lucide="sparkles" class="w-4 h-4 md:w-5 md:h-5"></i> Vectorize Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW 3: Results -->
+            <div id="result-view" class="hidden p-4 md:p-8">
+                <div class="flex flex-col md:flex-row md:items-start justify-between mb-6 md:mb-8 gap-4">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold text-slate-800 text-center md:text-left">Ready to Download</h2>
+                        <p class="text-slate-500 text-sm mt-1 text-center md:text-left">Flawless cut, optimized vectors.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 items-center">
+                        <div class="relative w-full sm:w-auto">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="edit-3" class="h-4 w-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="custom-filename" placeholder="Enter filename..." class="w-full sm:w-48 pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                        </div>
+                        <button id="btn-reset" class="w-full sm:w-auto text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg">
+                            Process Another
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <!-- PNG Card -->
+                    <div class="bg-slate-50 rounded-xl md:rounded-2xl p-4 md:p-6 border border-slate-200 flex flex-col">
+                        <div class="flex items-center gap-2 mb-3 md:mb-4 text-slate-700 font-semibold text-sm md:text-base">
+                            <i data-lucide="image" class="w-4 h-4 md:w-5 md:h-5 text-blue-500"></i> Perfect Cut PNG
+                        </div>
+                        <div class="flex-1 w-full aspect-square rounded-lg md:rounded-xl mb-4 md:mb-6 relative overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiI+PC9yZWN0Pgo8cmVjdCB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlZWVlZWUiPjwvcmVjdD4KPHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlZWVlZWUiPjwvcmVjdD4KPC9zdmc+')] border border-slate-200">
+                            <img id="result-png" src="" alt="Result" class="w-full h-full object-contain p-2 md:p-4" />
+                        </div>
+                        <button id="btn-dl-png" class="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl bg-white border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
+                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i> Download PNG
+                        </button>
+                    </div>
+
+                    <!-- SVG Card -->
+                    <div class="bg-slate-50 rounded-xl md:rounded-2xl p-4 md:p-6 border border-slate-200 flex flex-col">
+                        <div class="flex items-center justify-between mb-3 md:mb-4">
+                            <div class="flex items-center gap-2 text-slate-700 font-semibold text-sm md:text-base">
+                                <i data-lucide="layers" class="w-4 h-4 md:w-5 md:h-5 text-indigo-500"></i> Clean Vector SVG
+                            </div>
+                            <button id="btn-copy-svg" class="text-xs font-medium flex items-center gap-1.5 text-slate-500 hover:text-indigo-600 transition-colors" title="Copy SVG Code">
+                                <i data-lucide="copy" class="w-4 h-4"></i> <span id="copy-text">Copy Code</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 w-full aspect-square rounded-lg md:rounded-xl mb-4 md:mb-6 relative overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiI+PC9yZWN0Pgo8cmVjdCB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlZWVlZWUiPjwvcmVjdD4KPHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlZWVlZWUiPjwvcmVjdD4KPC9zdmc+')] border border-slate-200 flex items-center justify-center p-2 md:p-4">
+                            <div id="result-svg-container" class="w-full h-full flex items-center justify-center"></div>
+                        </div>
+                        <button id="btn-dl-svg" class="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm text-sm md:text-base">
+                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i> Download SVG
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Footer Ad Slot -->
+        <div class="w-full flex justify-center my-4 overflow-hidden min-h-[60px]">
+            <script>
+                atOptions = { 'key' : '93849c6012ce45c6974ca5095ff438ee', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+            </script>
+            <script src="https://www.highperformanceformat.com/93849c6012ce45c6974ca5095ff438ee/invoke.js"></script>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-4 md:py-6 text-center text-slate-500 text-xs md:text-sm mt-auto px-4">
+        © <script>document.write(new Date().getFullYear())</script> VectorAI V4. Built for Business.
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Initialize Icons safely
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+        });
+
+        // State Variables
+        let currentFile = null;
+        let finalPng = null;
+        let finalSvg = null;
+
+        // DOM Elements
+        const uploadView = document.getElementById('upload-view');
+        const previewView = document.getElementById('preview-view');
+        const resultView = document.getElementById('result-view');
+        const fileInput = document.getElementById('file-input');
+        const errorBanner = document.getElementById('error-banner');
+        const errorText = document.getElementById('error-text');
+        
+        // Handlers
+        uploadView.addEventListener('click', () => fileInput.click());
+        
+        uploadView.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadView.classList.add('border-indigo-500', 'bg-indigo-50/70');
+        });
+        
+        uploadView.addEventListener('dragleave', () => {
+            uploadView.classList.remove('border-indigo-500', 'bg-indigo-50/70');
+        });
+        
+        uploadView.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadView.classList.remove('border-indigo-500', 'bg-indigo-50/70');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorBanner.classList.remove('hidden');
+            setTimeout(() => errorBanner.classList.add('hidden'), 5000);
+        }
+
+        function formatBytes(bytes) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'], i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            if (file.type !== 'image/png') {
+                showError("Please upload a .png file.");
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                showError("File exceeds 10MB limit.");
+                return;
+            }
+
+            currentFile = file;
+            
+            // Clean up old object URL to prevent memory leaks
+            const oldPreviewSrc = document.getElementById('image-preview').src;
+            if(oldPreviewSrc) URL.revokeObjectURL(oldPreviewSrc);
+            
+            document.getElementById('image-preview').src = URL.createObjectURL(file);
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatBytes(file.size);
+            
+            // Set custom filename default
+            document.getElementById('custom-filename').value = file.name.replace(/\.[^/.]+$/, "");
+
+            uploadView.classList.add('hidden');
+            resultView.classList.add('hidden');
+            previewView.classList.remove('hidden');
+            previewView.classList.add('flex');
+        }
+
+        document.getElementById('btn-cancel').addEventListener('click', resetApp);
+        document.getElementById('btn-reset').addEventListener('click', resetApp);
+
+        function resetApp() {
+            currentFile = null;
+            finalPng = null;
+            finalSvg = null;
+            fileInput.value = '';
+            
+            // Reset Views
+            previewView.classList.add('hidden');
+            previewView.classList.remove('flex');
+            resultView.classList.add('hidden');
+            uploadView.classList.remove('hidden');
+            
+            // Hide Error if any
+            errorBanner.classList.add('hidden');
+        }
+
+        // Process API Call
+        document.getElementById('btn-process').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-process');
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            // Create a spin icon and keep the text
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 md:w-5 md:h-5 animate-spin"></i> Processing AI...`;
+            lucide.createIcons();
+
+            try {
+                const formData = new FormData();
+                formData.append('file', currentFile);
+
+                // Fetch data from Python Backend
+                const response = await fetch('/api/process-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Safely parse JSON to prevent "Unexpected end of JSON input" error 
+                // when the Python backend crashes and returns an HTML error page.
+                let data = {};
+                try {
+                    const textContent = await response.text();
+                    data = textContent ? JSON.parse(textContent) : {};
+                } catch (parseErr) {
+                    throw new Error(`Server Error (${response.status}): The backend crashed. Please check your Python terminal logs.`);
+                }
+                
+                if (!response.ok) throw new Error(data.detail || data.error || `Processing failed with status ${response.status}`);
+
+                finalPng = data.png_base64;
+                finalSvg = data.svg_content;
+
+                // Render Results
+                document.getElementById('result-png').src = finalPng;
+                
+                // Safe SVG preview rendering (strips xml headers and html comments safely)
+                let safeSvg = finalSvg.replace(/<\?xml.*?\?>/g, '').replace(/<!--[\s\S]*?-->/g, '');
+                document.getElementById('result-svg-container').innerHTML = safeSvg;
+
+                // Switch Views
+                previewView.classList.add('hidden');
+                previewView.classList.remove('flex');
+                resultView.classList.remove('hidden');
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                // Reset Button state
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 md:w-5 md:h-5"></i> Vectorize Now`;
+                lucide.createIcons();
+            }
+        });
+
+        // Downloads
+        function triggerDownload(content, type) {
+            let baseName = document.getElementById('custom-filename').value.trim() || 'image';
+            const link = document.createElement('a');
+            
+            if (type === 'png') {
+                link.href = content;
+                link.download = `${baseName}-cutout.png`;
+            } else {
+                const blob = new Blob([content], { type: 'image/svg+xml;charset=utf-8' });
+                link.href = URL.createObjectURL(blob);
+                link.download = `${baseName}-vector.svg`;
+            }
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('btn-dl-png').addEventListener('click', () => triggerDownload(finalPng, 'png'));
+        document.getElementById('btn-dl-svg').addEventListener('click', () => triggerDownload(finalSvg, 'svg'));
+
+        // Copy SVG
+        document.getElementById('btn-copy-svg').addEventListener('click', () => {
+            navigator.clipboard.writeText(finalSvg);
+            const copyText = document.getElementById('copy-text');
+            copyText.textContent = "Copied!";
+            setTimeout(() => {
+                copyText.textContent = "Copy Code";
+            }, 2500);
+        });
+
+    </script>
+</body>
+</html>
