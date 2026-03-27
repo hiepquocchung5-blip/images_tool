@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vectorai-pwa-v1';
+const CACHE_NAME = 'vectorai-pwa-v5';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -7,48 +7,54 @@ const urlsToCache = [
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
 ];
 
-// Install the Service Worker and cache the core UI assets
+// Install and Cache
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Force activate new service worker
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened PWA cache');
+        console.log('[PWA] Caching UI assets');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// Intercept network requests
-self.addEventListener('fetch', event => {
-  // Do NOT cache the AI API requests (we always want fresh processing)
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) {
-      return;
-  }
-  
-  // Serve cached UI for faster loads, otherwise fetch from internet
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response; 
-        }
-        return fetch(event.request);
-      })
-  );
-});
-
-// Clean up old caches on update
+// Clean up old caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[PWA] Clearing old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
+  );
+  self.clients.claim();
+});
+
+// NETWORK-FIRST STRATEGY: Always fetch fresh, fallback to cache if offline
+self.addEventListener('fetch', event => {
+  // Ignore API calls and POST requests
+  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) {
+      return;
+  }
+  
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // If network fetch is successful, clone it to cache and return
+        const resClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+        return response;
+      })
+      .catch(() => {
+        // If network fails (offline), load from cache
+        console.log('[PWA] Network failed, serving from cache');
+        return caches.match(event.request);
+      })
   );
 });
