@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VectorAI Studio | Perfect Background Removal</title>
     
-    <!-- PWA Install Metadata -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- PWA Install Metadata (Using Flask url_for pointing to root functions) -->
+    <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    
+    <!-- Safe to use static here, because icons don't dictate PWA scope -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon-192.png') }}">
 
     <!-- PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                // Pointing to the 'def service_worker():' function in app.py
+                navigator.serviceWorker.register("{{ url_for('service_worker') }}")
                     .then(function(reg) { console.log('PWA Ready: Service Worker registered!', reg.scope); })
                     .catch(function(err) { console.error('PWA Registration failed: ', err); });
             });
