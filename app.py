@@ -44,15 +44,18 @@ def index():
 
 # ==========================================
 # PWA ROUTES (Progressive Web App)
-# Serves the manifest and service worker from the root URL
+# Uses absolute paths to prevent 404 errors in Gunicorn
 # ==========================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+
 @app.route('/manifest.json')
 def manifest():
-    return send_from_directory('static', 'manifest.json')
+    return send_from_directory(STATIC_DIR, 'manifest.json')
 
 @app.route('/sw.js')
 def service_worker():
-    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
+    return send_from_directory(STATIC_DIR, 'sw.js', mimetype='application/javascript')
 
 @app.route('/api/process-image', methods=['POST'])
 def process_image():
