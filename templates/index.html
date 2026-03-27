@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VectorAI Studio | Perfect Background Removal</title>
+    
+    <!-- PWA Install Metadata -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
@@ -129,7 +137,7 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
                 </span>
-                V4 Liquid Engine Active
+                V4.2 Liquid Engine Active
             </div>
             <h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-indigo-900 to-fuchsia-900 mb-6 tracking-tighter drop-shadow-sm">
                 Flawless Vectors.<br/>Zero Effort.
@@ -292,6 +300,17 @@
         </div>
         © <script>document.write(new Date().getFullYear())</script> VectorAI Premium Studio. Powered by Local Processing.
     </footer>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('PWA Ready: Service Worker registered!', reg.scope))
+                    .catch(err => console.error('PWA Registration failed: ', err));
+            });
+        }
+    </script>
 
     <!-- Application Logic -->
     <script>
